@@ -2,9 +2,9 @@ import { IAutentica } from "../Interfaces/IAutentica"
 import { ChangeEvent, useState } from "react"
 import { appsettings } from "../settings/appsettings"
 import { useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import Swal from "sweetalert2"
 import { Container, Row, Col, Form, FormGroup, Label, Input, Button} from "reactstrap"
-import axios from "axios";
 
 
 const AutenticaInicial = {
@@ -49,8 +49,6 @@ export function Autenticar(){
         }
 
     }
-
-
     return(
         <Container className="mt-5">
             <Row>
@@ -69,6 +67,7 @@ export function Autenticar(){
 
                     </Form> 
                     <Button color="primary" className="me-4" onClick={validar}>Validar</Button>
+                    <Link className="btn btn-success " to="/nuevousuario">Nuevo Usuario</Link>
                 </Col>
             </Row>
         </Container>

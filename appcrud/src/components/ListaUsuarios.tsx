@@ -2,15 +2,15 @@ import { useEffect, useState } from "react"
 import { appsettings } from "../settings/appsettings"
 import { Link } from "react-router-dom"
 import Swal from "sweetalert2"
-import { IPedido } from "../Interfaces/IPedido"
+import { IUsuario } from "../Interfaces/IUsuario"
 import { Container, Row, Col, Table, Button} from "reactstrap"
 
-export function Lista(){
-    const [pedidos,setPedido] = useState<IPedido[]>([]);
+export function ListaUsuario {
+    const [usuarios,setUsuario] = useState<IUsuario[]>([]);
     const token = localStorage.getItem("token");
     console.log(token);
-    const obtenerPedidos = async() =>{
-            const response = await fetch(`${appsettings.apiUrl}Order/GetAll`,{
+    const obtenerUsuarios = async() =>{
+            const response = await fetch(`${appsettings.apiUrl}usuarios/getAll`,{
                 method : "GET",
                 headers:{
                         "Authorization": `Bearer ${token}`,
@@ -22,16 +22,16 @@ export function Lista(){
             );
             if(response.ok){
                      const data = await response.json();
-                     setPedido(data);
+                     setUsuario(data);
                  }
         }
      useEffect(()=>{ 
-        obtenerPedidos()  
+        obtenerUsuarios()  
         },[])
         
     const eliminar=(id:number) =>{
                 Swal.fire({
-                    title: "Eliminar pedido",
+                    title: "Eliminar Usuario",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonColor: "#3085d6",
@@ -39,40 +39,44 @@ export function Lista(){
                     confirmButtonText: "Si, eliminar!"
                     }).then(async(result) => {
                     if (result.isConfirmed) {
-                         const response = await fetch(`${appsettings.apiUrl}order/Eliminar/${id}`,{method:"DELETE"})
-                         if(response.ok) await obtenerPedidos()
+                         const response = await fetch(`${appsettings.apiUrl}usuarios/Eliminar/${id}`,{method:"DELETE"})
+                         if(response.ok) await obtenerUsuarios()
                    
                     }
                     });
         
             }
-
-    return(
+    
+     return(
              <Container className="mt-5">
                  <Row>
                      <Col sm={{size:8, offset:2}}>
                          <h4>Lista de Pedidos</h4>
                          <hr/>
-                        <Link className="btn btn-success mb-3" to="/nuevoPedido">Nuevo</Link>            
+                         
                          <Table bordered>
                             <thead>
                                 <tr>
-                                    <th>Nombre del cliente</th>
-                                    <th>Fecha</th>
-                                    <th>Estatus</th>
+                                    <th>Nombre de usuario</th>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>Correo</th>
+                                    <th>Teléfono</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {
-                                    pedidos.map((item) =>(
-                                        <tr key={item.orderId}>
-                                            <td>{item.customerName}</td>
-                                            <td>{item.orderDate}</td>
-                                            <td>{item.status}</td>
+                                    usuarios.map((item) =>(
+                                        <tr key={item.userName}>
+                                            <td>{item.nombre}</td>
+                                            <td>{item.apellido}</td>
+                                            <td>{item.email}</td>
+                                            <td>{item.telefono}</td>
+                                            <td>{item.enabled}</td>
                                             <td>
-                                                <Link className="btn btn-primary me-3" to={`/editarempleado/${item.orderId}`}>Editar</Link>
-                                                <Button color="danger" onClick={()=>{eliminar(item.orderId!)}}>Eliminar</Button>                                           
+                                                <Link className="btn btn-primary me-3" to={`/editarempleado/${item.id}`}>Editar</Link>
+                                                <Button color="danger" onClick={()=>{eliminar(item.id!)}}>Eliminar</Button>                                           
                                             </td>
                                         </tr>
                                     ) )
@@ -83,5 +87,6 @@ export function Lista(){
                  </Row>
              </Container>
         
-    )
-}
+    )   
+
+} 

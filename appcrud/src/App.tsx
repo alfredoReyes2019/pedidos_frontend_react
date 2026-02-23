@@ -1,7 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { Lista } from "./components/Lista"
-import { NuevoEmpleado } from "./components/NuevoEmpleado"
-import { EditarEmpleado } from "./components/EditarEmpleado"
+import { NuevoUsuario } from "./components/NuevoUsuario"
+import { NuevoPedido } from "./components/NuevoPedido"
+import { EditarUsuario } from "./components/EditarUsuario"
 import {Autenticar} from "./components/Autenticar";
 import {React} from "react";
 
@@ -20,33 +21,12 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Ruta pública */}
-        <Route path="/Autenticar" element={<Autenticar />} />
-
+        <Route path="/autenticar" element={<Autenticar />} />
+        <Route path="/nuevousuario" element={<NuevoUsuario />}/>
         {/* Rutas protegidas */}
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <Lista />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/nuevoempleado"
-          element={
-            <PrivateRoute>
-              <NuevoEmpleado />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/editarempleado/:id"
-          element={
-            <PrivateRoute>
-              <EditarEmpleado />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/" element={<PrivateRoute><Lista /></PrivateRoute>}/>
+        <Route path="/editarusuario/:id" element={<PrivateRoute><EditarUsuario /></PrivateRoute>}/>
+        <Route path="/nuevopedido" element={<PrivateRoute><NuevoPedido /></PrivateRoute>}/>
       </Routes>
     </BrowserRouter>
 
