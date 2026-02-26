@@ -1,7 +1,7 @@
 import type { IRol } from "./IRol"
 
 export interface IUsuario {
-    id?: number,
+    ID?: number,
     userName: string,
     password: string,
     nombre: string,

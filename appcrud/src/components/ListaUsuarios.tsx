@@ -5,12 +5,13 @@ import Swal from "sweetalert2"
 import { IUsuario } from "../Interfaces/IUsuario"
 import { Container, Row, Col, Table, Button} from "reactstrap"
 
-export function ListaUsuario {
+export function ListaUsuario() {
+
     const [usuarios,setUsuario] = useState<IUsuario[]>([]);
     const token = localStorage.getItem("token");
     console.log(token);
     const obtenerUsuarios = async() =>{
-            const response = await fetch(`${appsettings.apiUrl}usuarios/getAll`,{
+            const response = await fetch(`${appsettings.appiEmpleado}usuarios/getAll`,{
                 method : "GET",
                 headers:{
                         "Authorization": `Bearer ${token}`,
@@ -30,6 +31,7 @@ export function ListaUsuario {
         },[])
         
     const eliminar=(id:number) =>{
+            const token = localStorage.getItem("token");
                 Swal.fire({
                     title: "Eliminar Usuario",
                     icon: "warning",
@@ -39,7 +41,12 @@ export function ListaUsuario {
                     confirmButtonText: "Si, eliminar!"
                     }).then(async(result) => {
                     if (result.isConfirmed) {
-                         const response = await fetch(`${appsettings.apiUrl}usuarios/Eliminar/${id}`,{method:"DELETE"})
+                         const response = await fetch(`${appsettings.appiEmpleado}usuarios/Eliminar/${id}`,{method:"DELETE",
+                             headers:{
+                                "Authorization": `Bearer ${token}`,
+                                "content-Type":"application/json"
+                            },
+                         })
                          if(response.ok) await obtenerUsuarios()
                    
                     }
@@ -57,26 +64,28 @@ export function ListaUsuario {
                          <Table bordered>
                             <thead>
                                 <tr>
-                                    <th>Nombre de usuario</th>
+                                    <th>Usuario</th>
                                     <th>Nombre</th>
                                     <th>Apellido</th>
                                     <th>Correo</th>
                                     <th>Teléfono</th>
+                                    <th>Estatus</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {
                                     usuarios.map((item) =>(
-                                        <tr key={item.userName}>
+                                        <tr key={item.ID}>
+                                            <td>{item.userName}</td>
                                             <td>{item.nombre}</td>
                                             <td>{item.apellido}</td>
                                             <td>{item.email}</td>
                                             <td>{item.telefono}</td>
-                                            <td>{item.enabled}</td>
+                                            <td>{item.enabled?"Activo":"Inactivo"}</td>
                                             <td>
-                                                <Link className="btn btn-primary me-3" to={`/editarempleado/${item.id}`}>Editar</Link>
-                                                <Button color="danger" onClick={()=>{eliminar(item.id!)}}>Eliminar</Button>                                           
+                                                <Link className="btn btn-primary me-3" to={`/editarusuario/${item.ID}`}>Editar</Link>
+                                                <Button color="danger" onClick={()=>{eliminar(item.ID!)}}>Baja</Button>                                           
                                             </td>
                                         </tr>
                                     ) )

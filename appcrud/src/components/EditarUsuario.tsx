@@ -3,17 +3,18 @@ import { appsettings } from "../settings/appsettings"
 import { useNavigate, useParams } from "react-router-dom"
 import Swal from "sweetalert2"
 import { IUsuario } from "../Interfaces/IUsuario"
+import { IRol } from "../Interfaces/IRol"
 import { Container, Row, Col, Form, FormGroup, Label, Input, Button} from "reactstrap"
 
 const initialUsuario = {
-    id:0,
-   userName: "",
+    ID:0,
+    userName: "",
     password: "",
     nombre: "",
     apellido: "",
     email: "",
     telefono: "",
-    enabled: false,
+    enabled: true,
     roles : [{rolId:2, nombre:"NORMAL"}]
 }
 export function EditarUsuario(){
@@ -21,13 +22,20 @@ export function EditarUsuario(){
     const {id} = useParams<{id:string}>()
     const [usuario,setUsuario] = useState<IUsuario>(initialUsuario);
     const navigate = useNavigate(); 
-
+    const token = localStorage.getItem("token");
+    
     useEffect(()=>{
         const obtenerUsuario = async() =>{
-            const response = await fetch(`${appsettings.apiUrl}usuario/Obtener/${id}`)
+            const response = await fetch(`${appsettings.appiEmpleado}usuarios/UsuarioId/${id}`,{method:"GET",
+                             headers:{
+                                "Authorization": `Bearer ${token}`,
+                                "content-Type":"application/json"
+                            }
+                         })
             if(response.ok){
                      const data = await response.json();
                      setUsuario(data);
+                     console.log("REcueperar el usuario" + JSON.stringify(data));
                  }
         }
         obtenerUsuario()
@@ -43,16 +51,18 @@ export function EditarUsuario(){
     }
 
        const guardar = async() =>{
-            const response = await fetch(`${appsettings.apiUrl}usuarios`,{
-                method:'PUT',
+            console.log("Al guardar el usuario" + JSON.stringify(usuario));
+            const response = await fetch(`${appsettings.appiEmpleado}usuarios/`,{
+                method:'POST',
                 headers:{
+                    "Authorization": `Bearer ${token}`,
                     'content-Type':'application/json'
                 },
                 body:JSON.stringify(usuario)
             })
     
             if(response.ok){
-                navigate("/")
+                navigate("/listausuarios")
             }else{
                 Swal.fire({
                 title: "Error",
@@ -64,9 +74,33 @@ export function EditarUsuario(){
         }
 
     const volver = () =>{
-        navigate("/")
+        navigate("/listausuarios")
     }
 
+ 
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+
+    // Definir los roles disponibles con su ID
+    const rolesMap: Record<string, IRol> = {
+      ADMIN: { rolId: 1, nombre: "ADMIN" },
+      NORMAL: { rolId: 2, nombre: "NORMAL" }
+    };
+
+    if (checked) {
+      // Agregar rol si no existe
+      setUsuario({
+        ...usuario,
+        roles: [...usuario.roles, rolesMap[name]]
+      });
+    } else {
+      // Quitar rol si se desmarca
+      setUsuario({
+        ...usuario,
+        roles: usuario.roles.filter((r) => r.nombre !== name)
+      });
+    }
+  };
 
     return(
           <Container className="mt-5">
@@ -78,6 +112,7 @@ export function EditarUsuario(){
                         <FormGroup>
                             <Label>Nombre de usuario</Label>
                             <Input type="text" name="userName" onChange={inputChangeValue} value={usuario.userName} />
+                            <Input type="hidden" name="ID" onChange={inputChangeValue} value={usuario.ID} />
                         </FormGroup>
                         <FormGroup>
                             <Label>Contraseña</Label>
@@ -100,14 +135,20 @@ export function EditarUsuario(){
                             <Input type="text" name="telefono" onChange={inputChangeValue} value={usuario.telefono} />
                         </FormGroup>
                          <FormGroup>
-                            <Label>Estatus</Label>
-                            <Input type="radio" name="enabled" className="me-4" onChange={inputChangeValue} value={"true"} >Habilitado</Input>
-                            <Input type="radio" name="enabled" onChange={inputChangeValue} value={"false"} >Deshabilitado</Input>
+                            <Label className="me-4"><strong>Estatus</strong></Label>
+                            <br/>
+                            <Label className="me-4">Activo</Label>
+                            <Input type="radio" name="enabled" className="me-4" onChange={inputChangeValue} value="true" checked={usuario.enabled==true} >Habilitado</Input>
+                            <Label className="me-4">Inactivo</Label>
+                            <Input type="radio" name="enabled" onChange={inputChangeValue} value="false" checked={usuario.enabled==false} >Deshabilitado</Input>
                         </FormGroup>              
                          <FormGroup>
-                            <Label>Roles</Label>
-                            <Input type="checkbox" name="roles_admin" onChange={inputChangeValue} >ADMIN</Input>
-                            <Input type="checkbox" name="roles_normal" onChange={inputChangeValue} >NORMAL</Input>
+                            <Label > <strong>Roles</strong></Label>
+                            <br/>
+                            <Label className="me-4">Admin</Label>
+                            <Input type="checkbox" className="me-4" name="ADMIN" onChange={handleCheckboxChange} checked={usuario.roles.some((r) => r.nombre === "ADMIN")}/>
+                             <Label className="me-4">Normal</Label>
+                            <Input type="checkbox" className="me-4" name="NORMAL" onChange={handleCheckboxChange}   checked={usuario.roles.some((r) => r.nombre === "NORMAL")} />
                         </FormGroup>                                                              
 
                     </Form> 

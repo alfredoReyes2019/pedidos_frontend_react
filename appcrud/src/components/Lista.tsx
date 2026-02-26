@@ -30,6 +30,7 @@ export function Lista(){
         },[])
         
     const eliminar=(id:number) =>{
+                const token = localStorage.getItem("token");
                 Swal.fire({
                     title: "Eliminar pedido",
                     icon: "warning",
@@ -39,7 +40,12 @@ export function Lista(){
                     confirmButtonText: "Si, eliminar!"
                     }).then(async(result) => {
                     if (result.isConfirmed) {
-                         const response = await fetch(`${appsettings.apiUrl}order/Eliminar/${id}`,{method:"DELETE"})
+                         const response = await fetch(`${appsettings.apiUrl}order/Delete?id=${id}`,{method:"DELETE",
+                             headers:{
+                                "Authorization": `Bearer ${token}`,
+                                "content-Type":"application/json"
+                            },
+                         })
                          if(response.ok) await obtenerPedidos()
                    
                     }
@@ -53,7 +59,8 @@ export function Lista(){
                      <Col sm={{size:8, offset:2}}>
                          <h4>Lista de Pedidos</h4>
                          <hr/>
-                        <Link className="btn btn-success mb-3" to="/nuevoPedido">Nuevo</Link>            
+                        <Link className="btn btn-success mb-3 me-4" to="/nuevoPedido">Nuevo</Link>     
+                        <Link className="btn btn-success mb-3" to="/listausuarios">Gestionar Usuarios</Link>      
                          <Table bordered>
                             <thead>
                                 <tr>
@@ -71,7 +78,7 @@ export function Lista(){
                                             <td>{item.orderDate}</td>
                                             <td>{item.status}</td>
                                             <td>
-                                                <Link className="btn btn-primary me-3" to={`/editarempleado/${item.orderId}`}>Editar</Link>
+                                                <Link className="btn btn-primary me-3" to={`/editarpedido/${item.orderId}`}>Editar</Link>
                                                 <Button color="danger" onClick={()=>{eliminar(item.orderId!)}}>Eliminar</Button>                                           
                                             </td>
                                         </tr>
